@@ -1,0 +1,9 @@
+{
+  "trunk": {
+    "name": "My outbound trunk",
+    "address": "lk-test-2025.pstn.twilio.com",
+    "numbers": ["+12563968259"],
+    "auth_username": "livekit_user",
+    "auth_password": "Voiceai@2025"
+  }
+}
