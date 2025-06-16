@@ -1,31 +1,53 @@
-# requirements.txt
-# Core LiveKit Dependencies
+# enhanced_requirements.txt
+# Enhanced requirements for intelligent monitoring system
+
+# Core LiveKit Dependencies (your existing ones)
 livekit-agents[openai,silero,deepgram,cartesia,turn-detector]~=1.1.0
 livekit-api
 livekit-protocol
 
-# Qdrant and Vector Database
-qdrant-client>=1.14.2
-llama-index-core>=0.11.0
-llama-index-vector-stores-qdrant>=0.3.0
-llama-index-embeddings-openai>=0.2.0
+# Qdrant and Vector Database (your existing ones)
+qdrant-client
+llama-index-core
+llama-index-vector-stores-qdrant
+llama-index-embeddings-openai
 
-# AI and Embeddings
-openai>=1.3.0
+# AI and Embeddings (your existing ones)
+openai
 sentence-transformers
 fastembed
 
-# Essential Dependencies
-python-dotenv
+# Enhanced NLP for Intelligent Entity Extraction
+spacy
+spacy-llm
+transformers
+
+# Structured Data Processing
+pydantic
 pydantic-settings
+# Phone Number Processing
+phonenumbers
+
+# Geographic/Location Processing
+geopy
+uszipcode
+
+# Enhanced Text Processing
+nltk
+regex
+
+# Essential Dependencies (your existing ones)
+python-dotenv
 asyncio
 aiofiles
+numpy
+pandas
 
-# Document Processing
+# Document Processing (your existing ones)
 pypdf2
 python-docx
 markdown
 
-# Performance and Monitoring
-numpy
-pandas
+# Development and Testing
+pytest
+pytest-asyncio
