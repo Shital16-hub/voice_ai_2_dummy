@@ -1,53 +1,97 @@
-# enhanced_requirements.txt
-# Enhanced requirements for intelligent monitoring system
+# # enhanced_requirements.txt
+# # Enhanced requirements for intelligent monitoring system
 
-# Core LiveKit Dependencies (your existing ones)
-livekit-agents[openai,silero,deepgram,cartesia,turn-detector]~=1.1.0
-livekit-api
-livekit-protocol
+# # Core LiveKit Dependencies (your existing ones)
+# livekit-agents[openai,silero,deepgram,cartesia,turn-detector]~=1.1.0
+# livekit-api
+# livekit-protocol
 
-# Qdrant and Vector Database (your existing ones)
-qdrant-client
-llama-index-core
-llama-index-vector-stores-qdrant
-llama-index-embeddings-openai
+# # Qdrant and Vector Database (your existing ones)
+# qdrant-client
+# llama-index-core
+# llama-index-vector-stores-qdrant
+# llama-index-embeddings-openai
 
-# AI and Embeddings (your existing ones)
-openai
-sentence-transformers
-fastembed
+# # AI and Embeddings (your existing ones)
+# openai
+# sentence-transformers
+# fastembed
 
-# Enhanced NLP for Intelligent Entity Extraction
-spacy
-spacy-llm
-transformers
+# # Enhanced NLP for Intelligent Entity Extraction
+# spacy
+# spacy-llm
+# transformers
 
-# Structured Data Processing
-pydantic
-pydantic-settings
-# Phone Number Processing
-phonenumbers
+# # Structured Data Processing
+# pydantic
+# pydantic-settings
+# # Phone Number Processing
+# phonenumbers
 
-# Geographic/Location Processing
-geopy
-uszipcode
+# # Geographic/Location Processing
+# geopy
+# uszipcode
 
-# Enhanced Text Processing
-nltk
-regex
+# # Enhanced Text Processing
+# nltk
+# regex
 
-# Essential Dependencies (your existing ones)
-python-dotenv
+# # Essential Dependencies (your existing ones)
+# python-dotenv
+# asyncio
+# aiofiles
+# numpy
+# pandas
+
+# # Document Processing (your existing ones)
+# pypdf2
+# python-docx
+# markdown
+
+# # Development and Testing
+# pytest
+# pytest-asyncio
+
+
+# FIXED REQUIREMENTS FOR LIVEKIT AGENTS v1.1
+# This resolves the import errors and compatibility issues
+
+# Core LiveKit Dependencies - UPDATED to v1.1
+livekit-agents[openai,silero,deepgram,elevenlabs,turn-detector]~=1.1.0
+livekit-api>=2.0.0
+livekit-protocol>=1.0.0
+
+# Qdrant and Vector Database 
+qdrant-client>=1.9.0
+llama-index-core>=0.10.0
+llama-index-vector-stores-qdrant>=0.10.0
+llama-index-embeddings-openai>=0.10.0
+
+# AI and Embeddings
+openai>=1.35.0
+sentence-transformers>=2.7.0
+fastembed>=0.3.0
+
+# Essential Dependencies
+python-dotenv>=1.0.0
 asyncio
-aiofiles
-numpy
-pandas
+aiofiles>=23.0.0
+numpy>=1.24.0
+pandas>=2.0.0
 
-# Document Processing (your existing ones)
-pypdf2
-python-docx
-markdown
+# Document Processing
+pypdf2>=3.0.0
+python-docx>=1.1.0
+markdown>=3.5.0
 
 # Development and Testing
-pytest
-pytest-asyncio
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Pydantic for data validation (ensure compatibility)
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# System utilities
+psutil>=5.9.0
+requests>=2.31.0
