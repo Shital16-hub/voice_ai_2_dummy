@@ -1,0 +1,399 @@
+{
+  "room_name": "call-_+18188395060_JDLM4rHKetJb",
+  "start_time": "2025-06-16T21:20:46.300565",
+  "end_time": "2025-06-16T21:26:33.308786",
+  "duration_seconds": 347.008221,
+  "service_request": {
+    "service_type": "jump_start",
+    "customer": {
+      "name": "Shipta Nandri",
+      "phone": "8237757644",
+      "email": null,
+      "insurance_info": null
+    },
+    "vehicle": {
+      "year": "2016",
+      "make": "Volkswagen",
+      "model": "Vento",
+      "color": null,
+      "neutral_functional": true
+    },
+    "location": {
+      "address": "University",
+      "city": "New York City",
+      "state": "Ny",
+      "zip_code": "41611-8",
+      "landmarks": null,
+      "coordinates": null
+    },
+    "special_requirements": [],
+    "estimated_cost": null,
+    "job_number": null
+  },
+  "transcript_count": 39,
+  "full_transcript": [
+    {
+      "speaker": "agent",
+      "text": "Roadside assistance, this is Mark. How can I help you with your vehicle today? If you need to speak with a human agent, just let me know and I can transfer you.",
+      "timestamp": "2025-06-16T21:20:55.932295",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Roadside assistance, this is Mark. How can I help you with your vehicle today? If you need to speak with a human agent, just let me know and I can transfer you.",
+      "timestamp": "2025-06-16T21:20:55.936840",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Hello?",
+      "timestamp": "2025-06-16T21:21:06.146364",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Hello! I’m here to help you. What seems to be the problem with your vehicle today?",
+      "timestamp": "2025-06-16T21:21:14.537677",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "My card is broke down. I need help.",
+      "timestamp": "2025-06-16T21:21:19.975037",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "phone",
+      "timestamp": "2025-06-16T21:21:40.887552",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "I understand that your car is broken down, and I'm here to assist you. Could you please provide me with your full name?",
+      "timestamp": "2025-06-16T21:21:49.666257",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "My name is Phone Address.",
+      "timestamp": "2025-06-16T21:21:58.497972",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you, Phone Address. I appreciate your patience. Could you please provide me with your phone number?",
+      "timestamp": "2025-06-16T21:22:06.563455",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "No. No. No. No. No. My name is Shipta Nandri.",
+      "timestamp": "2025-06-16T21:22:10.637809",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for clarifying, Shipta Nandri. I appreciate it. Could you please provide me with your phone number?",
+      "timestamp": "2025-06-16T21:22:19.341739",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "It's (823) 775-7644.",
+      "timestamp": "2025-06-16T21:22:25.024609",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you, Shipta. I have your phone number as (823) 775-7644. Now, could you please provide me with your exact location, including the full address, city, state, and ZIP code?",
+      "timestamp": "2025-06-16T21:22:38.368054",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "I'm in New York now, University. It's the code is four one six four one eight.",
+      "timestamp": "2025-06-16T21:22:48.492851",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "And",
+      "timestamp": "2025-06-16T21:22:49.871548",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Hello?",
+      "timestamp": "2025-06-16T21:23:15.637683",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for your patience, Shipta. Just",
+      "timestamp": "2025-06-16T21:23:21.760593",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Hey.",
+      "timestamp": "2025-06-16T21:23:33.492027",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Hello again, Shipta! I’m still here to help you. I just need to confirm your location. Could you please provide the full address, including the street name and number, along with the city, state, and ZIP code?",
+      "timestamp": "2025-06-16T21:23:47.480143",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "It's New York City.",
+      "timestamp": "2025-06-16T21:23:53.384100",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "ZIP code is four one",
+      "timestamp": "2025-06-16T21:23:53.563616",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "six one one eight.",
+      "timestamp": "2025-06-16T21:23:55.528782",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for that information, Shipta. Just to confirm, your location is New York City, ZIP code 41611-8. \n\nNext, could you please tell me the",
+      "timestamp": "2025-06-16T21:24:09.340459",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Hello?",
+      "timestamp": "2025-06-16T21:24:19.481469",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "I'm here, Shipta! I appreciate your patience. Could you please provide me with the year, make, and model of your vehicle?",
+      "timestamp": "2025-06-16T21:24:27.948973",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "It's folks matters.",
+      "timestamp": "2025-06-16T21:24:33.346751",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "VINTO. May I please, uh, 02/2016?",
+      "timestamp": "2025-06-16T21:24:37.346764",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for the information, Shipta. Just to clarify, you mentioned \"folks matters\" and \"VINTO.\" Could you please confirm the make and model of your vehicle? Additionally, is the vehicle",
+      "timestamp": "2025-06-16T21:24:51.711693",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "No. No. No. It's Volkswagen.",
+      "timestamp": "2025-06-16T21:24:53.673663",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Vento. Volkswagen Vento.",
+      "timestamp": "2025-06-16T21:24:57.029617",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for clarifying, Shipta. So, your vehicle is a 2016 Volkswagen Vento. \n\nNow, could you please let me know what type of",
+      "timestamp": "2025-06-16T21:25:07.801820",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Right.",
+      "timestamp": "2025-06-16T21:25:08.093819",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Great! What type of service do you need? Are you looking for a tow, a jump start, a tire change, or something else?",
+      "timestamp": "2025-06-16T21:25:20.838006",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Start.",
+      "timestamp": "2025-06-16T21:25:23.665050",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "So, you need a jump start for your 2016 Volkswagen Vento. Just to confirm, is the vehicle's neutral",
+      "timestamp": "2025-06-16T21:25:33.500152",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Right.",
+      "timestamp": "2025-06-16T21:25:35.470063",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for the confirmation, Shipta. Here’s a summary of the information I have:\n\n- **Name:** Shipta Nandri\n- **Phone Number:** (823) 775-7644\n- **Location:** University, New York City, NY, ZIP 41611-8\n- **Vehicle:** 2016 Volkswagen Vento\n- **Service Needed:** Jump start\n- **Neutral Gear:** Functional\n\nI will now dispatch a technician to assist you with the jump start. Please hold on for a moment while I finalize the details.",
+      "timestamp": "2025-06-16T21:26:15.058877",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Okay.",
+      "timestamp": "2025-06-16T21:26:30.246205",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    },
+    {
+      "speaker": "customer",
+      "text": "Is it done?",
+      "timestamp": "2025-06-16T21:26:31.630238",
+      "is_final": true,
+      "confidence": null,
+      "extracted_entities": null,
+      "intent": null
+    }
+  ],
+  "data_completeness": {
+    "customer_name": true,
+    "customer_phone": true,
+    "vehicle_year": true,
+    "vehicle_make": true,
+    "vehicle_model": true,
+    "location_address": true,
+    "location_city": true,
+    "service_type_identified": true,
+    "job_number": false
+  },
+  "conversation_complete": false
+}
