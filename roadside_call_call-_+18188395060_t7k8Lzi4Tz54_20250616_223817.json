@@ -1,0 +1,216 @@
+{
+  "room_name": "call-_+18188395060_t7k8Lzi4Tz54",
+  "start_time": "2025-06-16T22:35:10.160703",
+  "end_time": "2025-06-16T22:38:17.040941",
+  "duration_seconds": 186.880238,
+  "service_request": {
+    "service_type": "unknown",
+    "customer": {
+      "name": null,
+      "phone": null,
+      "email": null,
+      "insurance_info": null
+    },
+    "vehicle": {
+      "year": null,
+      "make": null,
+      "model": null,
+      "color": null,
+      "neutral_functional": null
+    },
+    "location": {
+      "address": null,
+      "city": null,
+      "state": null,
+      "zip_code": null,
+      "landmarks": null,
+      "coordinates": null
+    },
+    "special_requirements": [],
+    "estimated_cost": null,
+    "job_number": null
+  },
+  "transcript_count": 30,
+  "full_transcript": [
+    {
+      "speaker": "agent",
+      "text": "Roadside assistance, this is Mark. How can I help with your vehicle today?",
+      "timestamp": "2025-06-16T22:35:52.400287",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I broke down my vehicle.",
+      "timestamp": "2025-06-16T22:35:57.796952",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Linsagme.",
+      "timestamp": "2025-06-16T22:35:58.614848",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Sorry to hear that. May I have your name, please?",
+      "timestamp": "2025-06-16T22:36:02.380912",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "My name is Sheetal Nandre.",
+      "timestamp": "2025-06-16T22:36:08.386890",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it, Sheetal. What's your phone number in case we get disconnected?",
+      "timestamp": "2025-06-16T22:36:13.523101",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "My phone number is 8237-7576-44.",
+      "timestamp": "2025-06-16T22:36:22.194915",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you. Where are you located right now?",
+      "timestamp": "2025-06-16T22:36:24.744993",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Now I am at",
+      "timestamp": "2025-06-16T22:36:32.400116",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Oooooh",
+      "timestamp": "2025-06-16T22:36:32.678631",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Los Angeles",
+      "timestamp": "2025-06-16T22:36:33.415754",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it, you're in Los Angeles. What's the make and model of your vehicle?",
+      "timestamp": "2025-06-16T22:36:38.037147",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Toma.",
+      "timestamp": "2025-06-16T22:36:43.407153",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Malu pisosotki",
+      "timestamp": "2025-06-16T22:36:44.706947",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Hola.",
+      "timestamp": "2025-06-16T22:36:45.280323",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "میکنگ 2016",
+      "timestamp": "2025-06-16T22:36:48.211491",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you, a 2016 Suzuki Swift. What type of service do you need?",
+      "timestamp": "2025-06-16T22:36:53.918532",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I will",
+      "timestamp": "2025-06-16T22:37:00.771425",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Tutto mai veicolo.",
+      "timestamp": "2025-06-16T22:37:03.571987",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it, you need a tow. Can you put the car in neutral gear?",
+      "timestamp": "2025-06-16T22:37:07.888343",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Yes.",
+      "timestamp": "2025-06-16T22:37:12.291631",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Great. We'll send a tow truck to your location in Los Angeles. Estimated cost starts at $100. Anything else you need?",
+      "timestamp": "2025-06-16T22:37:21.090647",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Mo.",
+      "timestamp": "2025-06-16T22:37:28.192853",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Thank you.",
+      "timestamp": "2025-06-16T22:37:28.850299",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "You're welcome, Sheetal. Help is on the way!",
+      "timestamp": "2025-06-16T22:37:31.807730",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Ok.",
+      "timestamp": "2025-06-16T22:37:37.206848",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Are you good?",
+      "timestamp": "2025-06-16T22:37:49.629492",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Saluber?",
+      "timestamp": "2025-06-16T22:38:06.487474",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Yes, I'm here. Need anything else?",
+      "timestamp": "2025-06-16T22:38:10.728810",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Can you please transfer a call to human?",
+      "timestamp": "2025-06-16T22:38:16.478582",
+      "is_final": true
+    }
+  ]
+}

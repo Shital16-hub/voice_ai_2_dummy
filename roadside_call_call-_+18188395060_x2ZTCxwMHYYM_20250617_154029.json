@@ -1,0 +1,264 @@
+{
+  "room_name": "call-_+18188395060_x2ZTCxwMHYYM",
+  "start_time": "2025-06-17T15:37:29.759806",
+  "end_time": "2025-06-17T15:40:29.068502",
+  "duration_seconds": 179.308696,
+  "service_request": {
+    "service_type": "unknown",
+    "customer": {
+      "name": null,
+      "phone": null,
+      "email": null,
+      "insurance_info": null
+    },
+    "vehicle": {
+      "year": null,
+      "make": null,
+      "model": null,
+      "color": null,
+      "neutral_functional": null
+    },
+    "location": {
+      "address": null,
+      "city": null,
+      "state": null,
+      "zip_code": null,
+      "landmarks": null,
+      "coordinates": null
+    },
+    "special_requirements": [],
+    "estimated_cost": null,
+    "job_number": null
+  },
+  "transcript_count": 38,
+  "full_transcript": [
+    {
+      "speaker": "agent",
+      "text": "Roadside assistance, this is Mark. How can I help with your vehicle today?",
+      "timestamp": "2025-06-17T15:38:10.217023",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "My car is broke down. Can you please help me?",
+      "timestamp": "2025-06-17T15:38:16.929152",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Sorry to hear that. I'll help you out. What's your name, and where are you located?",
+      "timestamp": "2025-06-17T15:38:22.055216",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "माय नेम इस शीतल लांडे.",
+      "timestamp": "2025-06-17T15:38:27.929147",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it, Sheetal. Where are you right now?",
+      "timestamp": "2025-06-17T15:38:30.743308",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Let me check.",
+      "timestamp": "2025-06-17T15:38:36.730930",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "All right",
+      "timestamp": "2025-06-17T15:38:37.151698",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I am at 123 men",
+      "timestamp": "2025-06-17T15:38:43.670584",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Street",
+      "timestamp": "2025-06-17T15:38:45.746551",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got",
+      "timestamp": "2025-06-17T15:38:48.611037",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "It's",
+      "timestamp": "2025-06-17T15:38:48.748753",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "اپارٹمنٹ فور بی",
+      "timestamp": "2025-06-17T15:38:50.349130",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Hello",
+      "timestamp": "2025-06-17T15:38:51.487171",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks, Sheetal. What's your phone number?",
+      "timestamp": "2025-06-17T15:38:54.103826",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I have not completed my address yet.",
+      "timestamp": "2025-06-17T15:39:00.456302",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it. What's the rest of your address?",
+      "timestamp": "2025-06-17T15:39:02.973391",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Ikx...",
+      "timestamp": "2025-06-17T15:39:14.390208",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Eee",
+      "timestamp": "2025-06-17T15:39:15.663195",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "123 minutes",
+      "timestamp": "2025-06-17T15:39:16.514505",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Apartment 4B.",
+      "timestamp": "2025-06-17T15:39:19.045405",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Springfield, Illinois.",
+      "timestamp": "2025-06-17T15:39:21.491153",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Zip code is 62704.",
+      "timestamp": "2025-06-17T15:39:24.283166",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it, Sheetal. What's your phone number, please?",
+      "timestamp": "2025-06-17T15:39:27.695400",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Ištektų?",
+      "timestamp": "2025-06-17T15:39:31.906466",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "3775U",
+      "timestamp": "2025-06-17T15:39:33.649085",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "1644",
+      "timestamp": "2025-06-17T15:39:36.354369",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks. What's the issue with your car?",
+      "timestamp": "2025-06-17T15:39:39.504171",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I think",
+      "timestamp": "2025-06-17T15:39:44.986946",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Deverizo.",
+      "timestamp": "2025-06-17T15:39:45.822922",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "It's not starting.",
+      "timestamp": "2025-06-17T15:39:47.891858",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Understood. Do you need a tow?",
+      "timestamp": "2025-06-17T15:39:50.772924",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "I think I need a jump start.",
+      "timestamp": "2025-06-17T15:39:56.928569",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "Okay, we'll send someone to jump-start your car. It should be around $50. We'll be there soon.",
+      "timestamp": "2025-06-17T15:40:03.884102",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Ok.",
+      "timestamp": "2025-06-17T15:40:10.651791",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "euro.",
+      "timestamp": "2025-06-17T15:40:11.069935",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Are there any extra charges for that?",
+      "timestamp": "2025-06-17T15:40:16.826897",
+      "is_final": true
+    },
+    {
+      "speaker": "agent",
+      "text": "No extra charges, just the $50. Help is on the way.",
+      "timestamp": "2025-06-17T15:40:20.195928",
+      "is_final": true
+    },
+    {
+      "speaker": "customer",
+      "text": "Can you please transfer a call to real agent?",
+      "timestamp": "2025-06-17T15:40:28.795678",
+      "is_final": true
+    }
+  ]
+}
