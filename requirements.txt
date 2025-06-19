@@ -1,92 +1,31 @@
-# # enhanced_requirements.txt
-# # Enhanced requirements for intelligent monitoring system
+# requirements.txt
+# Core LiveKit Dependencies
+livekit-agents[openai,silero,deepgram,cartesia,turn-detector]~=1.1.0
+livekit-api
+livekit-protocol
 
-# # Core LiveKit Dependencies (your existing ones)
-# livekit-agents[openai,silero,deepgram,cartesia,turn-detector]~=1.1.0
-# livekit-api
-# livekit-protocol
-
-# # Qdrant and Vector Database (your existing ones)
-# qdrant-client
-# llama-index-core
-# llama-index-vector-stores-qdrant
-# llama-index-embeddings-openai
-
-# # AI and Embeddings (your existing ones)
-# openai
-# sentence-transformers
-# fastembed
-
-# # Enhanced NLP for Intelligent Entity Extraction
-# spacy
-# spacy-llm
-# transformers
-
-# # Structured Data Processing
-# pydantic
-# pydantic-settings
-# # Phone Number Processing
-# phonenumbers
-
-# # Geographic/Location Processing
-# geopy
-# uszipcode
-
-# # Enhanced Text Processing
-# nltk
-# regex
-
-# # Essential Dependencies (your existing ones)
-# python-dotenv
-# asyncio
-# aiofiles
-# numpy
-# pandas
-
-# # Document Processing (your existing ones)
-# pypdf2
-# python-docx
-# markdown
-
-# # Development and Testing
-# pytest
-# pytest-asyncio
-
-
-# FIXED REQUIREMENTS FOR LIVEKIT AGENTS v1.1
-# This resolves the import errors and compatibility issues
-
-# requirements_fixed.txt
-# FIXED REQUIREMENTS FOR LIVEKIT AGENTS v1.1
-# This resolves the import errors and compatibility issues
-
-# requirements_fixed.txt
-# FIXED REQUIREMENTS FOR LIVEKIT AGENTS v1.1
-# This resolves the import errors and compatibility issues
-
-# Core LiveKit Dependencies - FIXED to v1.1
-livekit-agents[openai,silero,deepgram,elevenlabs]>=1.1.0,<1.2.0
-livekit-api>=1.0.0,<2.0.0
-livekit-protocol>=1.0.0,<2.0.0
+# Qdrant and Vector Database
+qdrant-client>=1.14.2
+llama-index-core>=0.11.0
+llama-index-vector-stores-qdrant>=0.3.0
+llama-index-embeddings-openai>=0.2.0
 
 # AI and Embeddings
-openai>=1.35.0
-httpx>=0.25.0  # Required for proper timeout handling
+openai>=1.3.0
+sentence-transformers
+fastembed
 
 # Essential Dependencies
-python-dotenv>=1.0.0
+python-dotenv
+pydantic-settings
 asyncio
-aiofiles>=23.0.0
-numpy>=1.24.0
+aiofiles
 
-# Data validation (ensure compatibility)
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
+# Document Processing
+pypdf2
+python-docx
+markdown
 
-# Development and Testing (optional)
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-
-# System utilities (optional)
-psutil>=5.9.0
-requests>=2.31.0
+# Performance and Monitoring
+numpy
+pandas
