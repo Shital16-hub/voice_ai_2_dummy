@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .venv
 env/
 venv/
@@ -202,3 +203,53 @@ data/
 
 # Voice AI Agent specific paths
 voice_ai_1/rag/data/
+
+# =================================
+# SECURITY - API Keys & Credentials
+# =================================
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Google Cloud Service Account files
+*.json
+*-service-account*.json
+*-credentials*.json
+service-account-*.json
+gcp-*.json
+google-cloud-*.json
+
+# Specific file mentioned in your error
+my-tts-project-458404-8ab56bac7265.json
+
+# API Keys and secrets
+api_keys.txt
+secrets.txt
+credentials.txt
+config.json
+secrets.json
+
+# Cloud provider credentials
+.aws/
+.gcp/
+.azure/
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Database credentials
+database.url
+db.url
+
+# Certificate files
+*.crt
+*.cer
+*.p12
+*.pfx

@@ -9,6 +9,8 @@ import os
 from typing import Optional, List, Dict, Any
 import time
 
+from livekit.plugins import google
+
 from livekit import agents, api
 from livekit.agents import (
     Agent, 
@@ -276,12 +278,15 @@ async def create_ultra_fast_session() -> AgentSession:
     logger.info("🎙️ Using ElevenLabs TTS with stable configuration")
     
     session = AgentSession(
-        # Fast STT
+        
         stt=deepgram.STT(
             model="nova-2-general",
             language="en",
         ),
-        
+        #  stt = google.STT(
+        #         model="chirp",
+        #         spoken_punctuation=False,
+        # ),
         # Fast LLM
         llm=openai.LLM(
             model="gpt-4o-mini",
