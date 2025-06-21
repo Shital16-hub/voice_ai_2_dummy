@@ -89,7 +89,7 @@ class QdrantConfig(BaseSettings):
     
     # 🚀 EMBEDDING OPTIMIZATION (Major Performance Gain)
     embedding_model: str = Field(default="text-embedding-3-small", env="EMBEDDING_MODEL")
-    embedding_dimensions: int = Field(default=512, env="EMBEDDING_DIMENSIONS")  # REDUCED from 1536
+    embedding_dimensions: int = Field(default=1536, env="EMBEDDING_DIMENSIONS") 
     
     # 🚀 EMBEDDING PERFORMANCE SETTINGS
     embedding_batch_size: int = Field(default=10, env="EMBEDDING_BATCH_SIZE")

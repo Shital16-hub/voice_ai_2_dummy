@@ -153,7 +153,7 @@ class QdrantRAGSystem:
             raise
     
     async def _setup_collection(self):
-        """Setup optimized Qdrant collection for local Docker"""
+        """Setup optimized Qdrant collection for local Docker with FIXED dimensions"""
         try:
             collection_name = config.qdrant_collection_name
             
@@ -168,14 +168,14 @@ class QdrantRAGSystem:
             )
             
             if not collection_exists:
-                # Create ultra-optimized collection for local Docker
+                # Create collection with FIXED 1536 dimensions for OpenAI
                 await asyncio.to_thread(
                     self.client.create_collection,
                     collection_name=collection_name,
                     vectors_config=VectorParams(
-                        size=config.embedding_dimensions,  # OPTIMIZED: Reduced dimensions
+                        size=1536,  # FIXED: Always use 1536 for OpenAI embeddings
                         distance=Distance.COSINE,
-                        # Optimized HNSW for local Docker (speed over accuracy)
+                        # Optimized HNSW for local Docker
                         hnsw_config=HnswConfigDiff(
                             m=16,
                             ef_construct=200,
@@ -193,7 +193,7 @@ class QdrantRAGSystem:
                         max_optimization_threads=1
                     )
                 )
-                logger.info(f"✅ Created ultra-optimized local collection: {collection_name}")
+                logger.info(f"✅ Created collection with FIXED 1536 dimensions: {collection_name}")
             else:
                 logger.info(f"✅ Using existing collection: {collection_name}")
                 

@@ -65,7 +65,7 @@ class EnhancedLiveKitConfig(BaseSettings):
     
     # 🚀 PERFORMANCE OPTIMIZATION
     embedding_model: str = Field(default="text-embedding-3-small", env="EMBEDDING_MODEL")
-    embedding_dimensions: int = Field(default=512, env="EMBEDDING_DIMENSIONS")
+    embedding_dimensions: int = Field(default=1536, env="EMBEDDING_DIMENSIONS")
     embedding_batch_size: int = Field(default=10, env="EMBEDDING_BATCH_SIZE")
     enable_embedding_cache: bool = Field(default=True, env="ENABLE_EMBEDDING_CACHE")
     embedding_cache_size: int = Field(default=1000, env="EMBEDDING_CACHE_SIZE")
