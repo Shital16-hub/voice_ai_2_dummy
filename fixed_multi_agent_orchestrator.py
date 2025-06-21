@@ -1,14 +1,13 @@
-# fixed_multi_agent_orchestrator.py - FIXED STT CONFIGURATION
+# final_working_multi_agent.py - BASED ON OFFICIAL LIVEKIT DOCUMENTATION
 """
-Multi-Agent Orchestrator with IMPROVED STT for better word recognition
-FIXED: Better Deepgram configuration for telephony accuracy
+Multi-Agent System with Proper on_enter() Lifecycle Hooks
+SOLUTION: Based on official LiveKit Pipeline Nodes & Hooks documentation
 """
 import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Union
-from enum import Enum
+from typing import Optional, Dict, Any, List
 
 from dotenv import load_dotenv
 from livekit import api, agents
@@ -30,103 +29,72 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from qdrant_rag_system import qdrant_rag
 from config import config
 
-# Import the fixed CallData from enhanced_conversational_agent
+# Import the CallData from enhanced_conversational_agent
 from enhanced_conversational_agent import CallData
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-class AgentType(Enum):
-    DISPATCHER = "dispatcher"
-    TOWING_SPECIALIST = "towing_specialist"
-    BATTERY_SPECIALIST = "battery_specialist"
-    TIRE_SPECIALIST = "tire_specialist"
-    EMERGENCY_RESPONSE = "emergency_response"
-    INSURANCE_SPECIALIST = "insurance_specialist"
-    CUSTOMER_SERVICE = "customer_service"
-
 @dataclass
-class HandoffContext:
-    """Context information for agent handoffs"""
-    reason: str
-    previous_agent: str
-    conversation_summary: str
-    urgency_level: str
-    collected_info: Dict[str, Any]
-    next_steps: List[str] = field(default_factory=list)
+class CustomerData:
+    """Customer information that persists across agent handoffs"""
+    name: str = ""
+    phone: str = ""
+    location: str = ""
+    vehicle_year: str = ""
+    vehicle_make: str = ""
+    vehicle_model: str = ""
+    service_type: str = ""
+    
+    def get_summary(self) -> str:
+        """Create a summary for agent handoff"""
+        parts = []
+        if self.name: parts.append(f"Customer: {self.name}")
+        if self.phone: parts.append(f"Phone: {self.phone}")
+        if self.location: parts.append(f"Location: {self.location}")
+        if self.vehicle_year or self.vehicle_make:
+            vehicle = f"{self.vehicle_year} {self.vehicle_make} {self.vehicle_model}".strip()
+            parts.append(f"Vehicle: {vehicle}")
+        if self.service_type: parts.append(f"Service: {self.service_type}")
+        return " | ".join(parts) if parts else "No information collected yet"
 
 class DispatcherAgent(Agent):
-    """Main dispatcher that routes calls to appropriate specialists"""
+    """Main dispatcher that collects info and routes to specialists"""
     
     def __init__(self) -> None:
         super().__init__(
-            instructions="""You are Mark, a professional roadside assistance dispatcher. 
+            instructions="""You are Mark, a professional roadside assistance dispatcher.
 
-CONVERSATION FLOW (gather ONE piece at a time):
-1. If no name: "Could you please provide your full name?"
-2. If no phone: "Could you also provide a good phone number where we can reach you?"
-3. If no location: "What is the exact location of your vehicle?"
-4. If no vehicle info: "Could you tell me the year, make, and model of your vehicle?"
-5. If no service type: "What type of service do you need today?"
+TASK: Collect customer information step by step, then route to the appropriate specialist.
 
-RESPONSE STYLE:
-- Keep under 25 words for phone clarity
-- Confirm unclear information: "Just to confirm, you said..."
-- Be patient and professional
-- Use context clues to understand intent
+INFORMATION GATHERING SEQUENCE:
+1. Full name
+2. Phone number
+3. Vehicle location (complete address)
+4. Vehicle details (year, make, model)
+5. Service type needed
 
-USE FUNCTIONS:
-- search_knowledge: For pricing, services, policies
-- gather_caller_information: Store information as gathered
-- route_to_specialist: For complex issues needing expertise"""
+ROUTING RULES:
+- For towing: Use transfer_to_towing_specialist()
+- For battery issues: Use transfer_to_battery_specialist()
+- For tire problems: Use transfer_to_tire_specialist()
+
+STYLE:
+- Ask ONE question at a time
+- Be empathetic and professional
+- Keep responses under 25 words for phone clarity
+- Confirm information when provided"""
         )
-        self.call_start_time = time.time()
-        
-    # Let the LLM handle conversation flow naturally - no hardcoded patterns needed
+
+    async def on_enter(self):
+        """Called when this agent becomes active"""
+        await self.session.generate_reply(
+            instructions="Give a professional greeting: 'Roadside assistance, this is Mark, how can I help you today?'"
+        )
 
     @function_tool()
-    async def search_knowledge(self, context: RunContext[CallData], query: str) -> str:
-        """Search knowledge base - FIXED with better error handling"""
-        try:
-            logger.info(f"🔍 SEARCHING KNOWLEDGE BASE: {query}")
-            
-            results = await asyncio.wait_for(
-                qdrant_rag.search(query, limit=2),
-                timeout=2.0
-            )
-            
-            if results and len(results) > 0:
-                relevant_results = []
-                for result in results:
-                    if result["score"] >= 0.15:
-                        relevant_results.append(result)
-                
-                if relevant_results:
-                    response_parts = []
-                    for result in relevant_results[:2]:
-                        text = result["text"]
-                        cleaned = text.replace("Q:", "").replace("A:", "").strip()
-                        if len(cleaned) > 20:
-                            response_parts.append(cleaned)
-                    
-                    if response_parts:
-                        combined_response = " | ".join(response_parts)
-                        logger.info(f"📊 Found {len(relevant_results)} relevant results")
-                        return combined_response[:200]
-                
-            logger.warning(f"⚠️ No relevant results found for: {query}")
-            return "I don't have specific information about that. Let me connect you with a specialist who can provide detailed information."
-                
-        except asyncio.TimeoutError:
-            logger.error("❌ Knowledge search timeout")
-            return "I'm having trouble accessing the information right now. Let me transfer you to someone who can help."
-        except Exception as e:
-            logger.error(f"❌ Knowledge search error: {e}")
-            return "I'm having trouble accessing the information. Let me transfer you to someone who can help."
-
-    @function_tool()
-    async def gather_caller_information(
-        self, 
+    async def collect_information(
+        self,
         context: RunContext[CallData],
         name: str = None,
         phone: str = None,
@@ -134,153 +102,253 @@ USE FUNCTIONS:
         vehicle_year: str = None,
         vehicle_make: str = None,
         vehicle_model: str = None,
-        vehicle_color: str = None,
-        issue: str = None,
-        service_needed: str = None
+        service_type: str = None
     ) -> str:
-        """Store caller information as it's gathered one piece at a time"""
+        """Collect customer information step by step"""
         
-        if name:
-            context.userdata.caller_name = name
-            context.userdata.gathered_info["name"] = True
-            return "Thank you. Could you also provide a good phone number where we can reach you?"
-            
-        if phone:
-            context.userdata.phone_number = phone
-            context.userdata.gathered_info["phone"] = True
-            return "Got it. What is the exact location of your vehicle?"
-            
-        if location:
-            context.userdata.location = location
-            context.userdata.gathered_info["location"] = True
-            return "Perfect. Could you tell me the year, make, and model of your vehicle?"
-            
-        if any([vehicle_year, vehicle_make, vehicle_model, vehicle_color]):
-            if vehicle_year:
-                context.userdata.vehicle_year = vehicle_year
-            if vehicle_make:
-                context.userdata.vehicle_make = vehicle_make
-            if vehicle_model:
-                context.userdata.vehicle_model = vehicle_model
-            if vehicle_color:
-                context.userdata.vehicle_color = vehicle_color
-            context.userdata.gathered_info["vehicle"] = True
+        # Initialize customer data in userdata if needed
+        if not hasattr(context.userdata, 'customer'):
+            context.userdata.customer = CustomerData()
+        
+        customer = context.userdata.customer
+        
+        # Update with provided information
+        if name: customer.name = name
+        if phone: customer.phone = phone
+        if location: customer.location = location
+        if vehicle_year: customer.vehicle_year = vehicle_year
+        if vehicle_make: customer.vehicle_make = vehicle_make
+        if vehicle_model: customer.vehicle_model = vehicle_model
+        if service_type: customer.service_type = service_type
+        
+        # Determine what to ask next
+        if not customer.name:
+            return "Could you please provide your full name?"
+        elif not customer.phone:
+            return "Thank you. Could you provide a phone number where we can reach you?"
+        elif not customer.location:
+            return "Got it. What is the exact location of your vehicle? Please provide the complete address."
+        elif not customer.vehicle_year or not customer.vehicle_make:
+            return "Perfect. What year, make, and model is your vehicle?"
+        elif not customer.service_type:
             return "Great. What type of service do you need today?"
-            
-        if service_needed:
-            context.userdata.service_type = service_needed
-            context.userdata.gathered_info["service"] = True
-            return "Perfect! I have all your information. Let me find the best service options for you."
-        
-        return "Could you provide that information again?"
+        else:
+            return "Excellent! I have all your information. Let me connect you with the right specialist."
 
     @function_tool()
-    async def route_to_specialist(
-        self, 
-        context: RunContext[CallData],
-        specialist_type: str,
-        reason: str = "Specialized assistance needed"
-    ) -> str:
-        """Route call to appropriate specialist agent"""
+    async def transfer_to_towing_specialist(self, context: RunContext[CallData]) -> Agent:
+        """Transfer to towing specialist with customer context"""
+        logger.info("🔄 TRANSFERRING TO TOWING SPECIALIST")
         
-        logger.info(f"🔄 Routing to {specialist_type}: {reason}")
-        specialist_name = specialist_type.replace('_', ' ').title()
-        return f"I'm connecting you with our {specialist_name} who can provide expert assistance. Please hold."
+        customer = getattr(context.userdata, 'customer', CustomerData())
+        return TowingSpecialistAgent(customer)
 
-# Keep all the specialist classes the same...
+    @function_tool()
+    async def transfer_to_battery_specialist(self, context: RunContext[CallData]) -> Agent:
+        """Transfer to battery specialist with customer context"""
+        logger.info("🔄 TRANSFERRING TO BATTERY SPECIALIST")
+        
+        customer = getattr(context.userdata, 'customer', CustomerData())
+        return BatterySpecialistAgent(customer)
+
+    @function_tool()
+    async def transfer_to_tire_specialist(self, context: RunContext[CallData]) -> Agent:
+        """Transfer to tire specialist with customer context"""
+        logger.info("🔄 TRANSFERRING TO TIRE SPECIALIST")
+        
+        customer = getattr(context.userdata, 'customer', CustomerData())
+        return TireSpecialistAgent(customer)
+
 class TowingSpecialistAgent(Agent):
-    def __init__(self, handoff_context: HandoffContext):
-        self.handoff_context = handoff_context
-        super().__init__(instructions=f"Towing specialist. Context: {handoff_context.conversation_summary}")
+    """Towing specialist with proper on_enter() greeting"""
+    
+    def __init__(self, customer: CustomerData):
+        self.customer = customer
+        
+        super().__init__(
+            instructions=f"""You are a TOWING SPECIALIST.
+
+CUSTOMER INFORMATION (already collected by dispatcher):
+{customer.get_summary()}
+
+CRITICAL: DO NOT ask for name, phone, location, or vehicle info again! You already have it.
+
+YOUR ROLE:
+- Assess towing requirements and destination
+- Provide distance-based pricing quotes
+- Arrange towing service scheduling
+- Handle special vehicle requirements (AWD, low clearance, etc.)
+
+Use search_towing_rates for current pricing information.
+Keep responses professional and under 30 words for phone clarity."""
+        )
+
+    async def on_enter(self):
+        """CRITICAL: Called when this agent becomes active - greet with context"""
+        vehicle_info = f"{self.customer.vehicle_year} {self.customer.vehicle_make} {self.customer.vehicle_model}".strip()
+        location = self.customer.location or "your location"
+        
+        await self.session.generate_reply(
+            instructions=f"Greet as towing specialist: 'Hi {self.customer.name}, I'm your towing specialist. I see you need towing for your {vehicle_info} at {location}. Where would you like it towed to?'"
+        )
+
+    @function_tool()
+    async def search_towing_rates(self, context: RunContext[CallData], query: str) -> str:
+        """Search for towing rates and policies"""
+        try:
+            enhanced_query = f"towing service pricing rates {query}"
+            results = await asyncio.wait_for(qdrant_rag.search(enhanced_query, limit=1), timeout=0.5)
+            if results and results[0]["score"] >= 0.2:
+                return results[0]["text"][:120]
+            return "Let me check our current towing rates and availability."
+        except Exception:
+            return "I'll verify those details for you."
+
+    @function_tool()
+    async def calculate_towing_quote(
+        self,
+        context: RunContext[CallData],
+        distance_miles: float,
+        destination: str = "repair shop"
+    ) -> str:
+        """Calculate towing quote based on distance"""
+        base_rate = 75
+        per_mile = 3.50
+        total = base_rate + (distance_miles * per_mile)
+        
+        return f"Towing to {destination}: ${base_rate} hookup + ${per_mile}/mile × {distance_miles:.1f} miles = ${total:.2f} total. ETA: 30-45 minutes."
 
 class BatterySpecialistAgent(Agent):
-    def __init__(self, handoff_context: HandoffContext):
-        self.handoff_context = handoff_context
-        super().__init__(instructions=f"Battery specialist. Context: {handoff_context.conversation_summary}")
+    """Battery specialist with proper on_enter() greeting"""
+    
+    def __init__(self, customer: CustomerData):
+        self.customer = customer
+        
+        super().__init__(
+            instructions=f"""You are a BATTERY SPECIALIST.
+
+CUSTOMER INFO: {customer.get_summary()}
+
+DO NOT re-ask for basic information! Focus on:
+- Battery symptoms and diagnosis
+- Jump start vs replacement options
+- Service scheduling and pricing
+
+Use search_battery_services for service information."""
+        )
+
+    async def on_enter(self):
+        """Called when this agent becomes active"""
+        await self.session.generate_reply(
+            instructions=f"Greet as battery specialist: 'Hi {self.customer.name}, I'm your battery specialist. I have your location and vehicle info. What battery problems are you experiencing?'"
+        )
+
+    @function_tool()
+    async def search_battery_services(self, context: RunContext[CallData], query: str) -> str:
+        """Search battery service information"""
+        try:
+            enhanced_query = f"battery jumpstart replacement service {query}"
+            results = await asyncio.wait_for(qdrant_rag.search(enhanced_query, limit=1), timeout=0.5)
+            if results and results[0]["score"] >= 0.2:
+                return results[0]["text"][:120]
+            return "Let me check our battery service options."
+        except Exception:
+            return "I'll verify our battery services."
 
 class TireSpecialistAgent(Agent):
-    def __init__(self, handoff_context: HandoffContext):
-        self.handoff_context = handoff_context
-        super().__init__(instructions=f"Tire specialist. Context: {handoff_context.conversation_summary}")
+    """Tire specialist with proper on_enter() greeting"""
+    
+    def __init__(self, customer: CustomerData):
+        self.customer = customer
+        
+        super().__init__(
+            instructions=f"""You are a TIRE SPECIALIST.
 
-class EmergencyResponseAgent(Agent):
-    def __init__(self, handoff_context: HandoffContext):
-        self.handoff_context = handoff_context
-        super().__init__(instructions=f"Emergency response. Context: {handoff_context.conversation_summary}")
+CUSTOMER INFO: {customer.get_summary()}
 
-class CustomerServiceAgent(Agent):
-    def __init__(self, handoff_context: HandoffContext):
-        self.handoff_context = handoff_context
-        super().__init__(instructions=f"Customer service. Context: {handoff_context.conversation_summary}")
+Focus on tire service needs:
+- Type of tire damage assessment
+- Spare tire availability check
+- Repair vs replacement recommendations
 
-async def create_optimized_session(userdata: CallData) -> AgentSession[CallData]:
-    """Create session with IMPROVED STT configuration for telephony"""
+Use search_tire_services for service information."""
+        )
+
+    async def on_enter(self):
+        """Called when this agent becomes active"""
+        await self.session.generate_reply(
+            instructions=f"Greet as tire specialist: 'Hi {self.customer.name}, I'm your tire specialist. I have your vehicle and location info. What's the tire problem? Do you have a spare tire available?'"
+        )
+
+    @function_tool()
+    async def search_tire_services(self, context: RunContext[CallData], query: str) -> str:
+        """Search tire service information"""
+        try:
+            enhanced_query = f"tire flat repair change service {query}"
+            results = await asyncio.wait_for(qdrant_rag.search(enhanced_query, limit=1), timeout=0.5)
+            if results and results[0]["score"] >= 0.2:
+                return results[0]["text"][:120]
+            return "Let me check our tire service options."
+        except Exception:
+            return "I'll verify our tire services."
+
+async def create_session_with_userdata(call_data: CallData) -> AgentSession[CallData]:
+    """Create session with proper userdata support for agent handoffs"""
     
     session = AgentSession[CallData](
-        # 🔧 PROPER STT CONFIGURATION FOR TELEPHONY
         stt=deepgram.STT(
-            model="nova-2-phonecall",    # CORRECT: Telephony-optimized model
+            model="nova-2-general",
             language="en-US",
-            
-            # LiveKit Deepgram STT supported parameters only
-            smart_format=True,           # Better formatting
-            punctuate=True,             # Add punctuation
-            profanity_filter=False,     # Allow natural speech
-            numerals=True,              # Convert numbers properly
-            interim_results=True,       # Get partial results
-            endpointing_ms=300,         # 300ms silence detection for end of speech
-            filler_words=True,          # Handle "um", "uh" naturally
+            smart_format=True,
+            profanity_filter=False,
+            numerals=True,
         ),
         
-        # Faster LLM settings
         llm=openai.LLM(
             model="gpt-4o-mini",
             temperature=0.1,
         ),
         
-        # Optimized TTS for clarity
         tts=elevenlabs.TTS(
             voice_id="21m00Tcm4TlvDq8ikWAM",
             voice_settings=elevenlabs.VoiceSettings(
-                stability=0.7,           # More stable for phone
-                similarity_boost=0.8,
-                style=0.1,
-                speed=0.9                # Slightly slower for clarity
+                stability=0.6,
+                similarity_boost=0.7,
+                style=0.0,
+                speed=1.0
             ),
             model="eleven_turbo_v2_5",
         ),
         
-        # Optimized VAD for telephony
         vad=silero.VAD.load(),
         turn_detection=MultilingualModel(),
         
-        # TELEPHONY-OPTIMIZED TIMING
         allow_interruptions=True,
-        min_interruption_duration=0.5,   # Allow natural interruptions
-        min_endpointing_delay=0.8,       # Wait for user to finish
-        max_endpointing_delay=3.0,       # Don't wait too long
+        min_interruption_duration=0.4,
+        min_endpointing_delay=0.6,
+        max_endpointing_delay=2.5,
         
-        userdata=userdata
+        userdata=call_data
     )
     
     return session
 
 async def entrypoint(ctx: JobContext):
-    """Entrypoint with IMPROVED STT for better word recognition"""
+    """Entrypoint with proper agent lifecycle management"""
     
-    logger.info("🚀 Multi-Agent System with Proper STT Starting")
-    logger.info("🔧 Using nova-2-phonecall model for telephony accuracy")
+    logger.info("🚀 FINAL Multi-Agent System with on_enter() Lifecycle Hooks")
+    logger.info("✅ Based on official LiveKit Pipeline Nodes & Hooks documentation")
     
     await ctx.connect()
     
-    # Initialize knowledge base in background
+    # Initialize Qdrant in background
     asyncio.create_task(qdrant_rag.initialize())
     
     # Create call data and session
     call_data = CallData()
-    session = await create_optimized_session(call_data)
+    session = await create_session_with_userdata(call_data)
     
-    # Start with dispatcher agent
+    # Start with dispatcher agent (on_enter() will be called automatically)
     dispatcher = DispatcherAgent()
     
     await session.start(
@@ -288,18 +356,12 @@ async def entrypoint(ctx: JobContext):
         room=ctx.room
     )
     
-    # Give greeting
-    await session.generate_reply(
-        instructions="Give a clear, slow greeting: 'Roadside assistance, this is Mark, how can I help you?'"
-    )
-    
-    logger.info("✅ Multi-agent system ready with proper STT")
-    logger.info("🎯 Using Deepgram nova-2-phonecall for better telephony accuracy")
+    logger.info("✅ Multi-agent system ready with proper lifecycle hooks")
 
 if __name__ == "__main__":
     try:
-        logger.info("🎙️ Starting Multi-Agent System with Proper STT")
-        logger.info("🔧 STT: Deepgram nova-2-phonecall for telephony")
+        logger.info("🎙️ Starting FINAL Multi-Agent System")
+        logger.info("🔄 Agent handoffs with proper on_enter() lifecycle hooks")
         
         cli.run_app(WorkerOptions(
             entrypoint_fnc=entrypoint,
