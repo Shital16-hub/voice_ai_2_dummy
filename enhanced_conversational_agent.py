@@ -1,7 +1,7 @@
-# enhanced_conversational_agent.py
+# enhanced_conversational_agent.py - FIXED VERSION
 """
 Enhanced LiveKit 1.0 Voice Agent with Natural Conversation Flow
-Uses dynamic knowledge base from Excel for all service information and pricing
+FIXED: Updated to use correct turn detector imports
 """
 import asyncio
 import logging
@@ -24,8 +24,9 @@ from livekit.agents import (
     function_tool,
     get_job_context
 )
-from livekit.plugins import deepgram, openai, elevenlabs, silero, turn_detector
-from livekit.agents.voice import MetricsCollectedEvent
+from livekit.plugins import deepgram, openai, elevenlabs, silero
+# FIXED: Import the correct turn detector classes
+from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from qdrant_rag_system import qdrant_rag
 from config import config
@@ -540,10 +541,10 @@ Call Duration: {time.time() - self.call_start_time:.0f} seconds"""
         
         return "Addressing audio/connection issues with caller"
 
-async def create_enhanced_session() -> AgentSession:
+async def create_enhanced_session(userdata: CallData) -> AgentSession[CallData]:
     """Create optimized session for natural conversation matching transcript quality"""
     
-    session = AgentSession(
+    session = AgentSession[CallData](
         # Enhanced STT for better accuracy - matching transcript quality
         stt=deepgram.STT(
             model="nova-2-general",
@@ -573,13 +574,17 @@ async def create_enhanced_session() -> AgentSession:
         
         # Enhanced turn detection for natural conversation flow
         vad=silero.VAD.load(),
-        turn_detection=turn_detector.EOUModel(),  # Semantic end-of-utterance detection
+        # FIXED: Use MultilingualModel instead of EOUModel
+        turn_detection=MultilingualModel(),  # Semantic end-of-utterance detection
         
         # Natural conversation timing (based on transcript analysis)
         allow_interruptions=True,
         min_interruption_duration=0.6,  # Allow natural interruptions
         min_endpointing_delay=0.8,      # Natural pause handling
         max_endpointing_delay=4.0,      # Allow time for people to think
+        
+        # FIXED: userdata goes in constructor, not start() method
+        userdata=userdata
     )
     
     return session
@@ -595,22 +600,26 @@ async def entrypoint(ctx: JobContext):
     # Initialize systems in parallel
     init_start = time.time()
     init_tasks = [
-        qdrant_rag.initialize(),
-        create_enhanced_session()
+        qdrant_rag.initialize()
     ]
     
-    rag_ready, session = await asyncio.gather(*init_tasks)
-    init_time = (time.time() - init_start) * 1000
+    rag_ready = await asyncio.gather(*init_tasks)
+    rag_ready = rag_ready[0]  # Extract boolean from list
     
     # Create enhanced agent with call data tracking
     agent = EnhancedRoadsideAgent()
     
-    # Start session with call data context
+    # Create call data and session
+    call_data = CallData()
+    session = await create_enhanced_session(call_data)
+    
+    # FIXED: start() only takes agent and room parameters
     await session.start(
-        room=ctx.room, 
         agent=agent,
-        userdata=CallData()  # Initialize empty call data
+        room=ctx.room
     )
+    
+    init_time = (time.time() - init_start) * 1000
     
     # Professional greeting matching transcript style
     await session.generate_reply(

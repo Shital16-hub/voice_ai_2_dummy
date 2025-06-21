@@ -1,7 +1,7 @@
-# multi_agent_orchestrator.py
+# multi_agent_orchestrator.py - FIXED VERSION
 """
 Multi-Agent Orchestrator for Specialized Roadside Assistance
-Routes calls to specialized agents based on service type and complexity
+FIXED: Updated to use correct turn detector imports
 """
 import asyncio
 import logging
@@ -24,11 +24,15 @@ from livekit.agents import (
     function_tool,
     get_job_context
 )
-from livekit.plugins import deepgram, openai, elevenlabs, silero, turn_detector
+from livekit.plugins import deepgram, openai, elevenlabs, silero
+# FIXED: Import the correct turn detector classes
+from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from qdrant_rag_system import qdrant_rag
 from config import config
-from enhanced_conversational_agent import CallData, create_enhanced_session
+
+# Import the fixed CallData from enhanced_conversational_agent
+from enhanced_conversational_agent import CallData
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -475,6 +479,54 @@ Focus on customer satisfaction and clear communication."""
         except Exception:
             return "I'll look that up for you."
 
+async def create_enhanced_session(userdata: CallData) -> AgentSession[CallData]:
+    """Create optimized session for natural conversation matching transcript quality"""
+    
+    session = AgentSession[CallData](
+        # Enhanced STT for better accuracy - matching transcript quality
+        stt=deepgram.STT(
+            model="nova-2-general",
+            language="en-US",
+            smart_format=True,  # Better punctuation and formatting
+            profanity_filter=False,  # Allow natural speech
+            numerals=True,  # Convert numbers properly
+        ),
+        
+        # Optimized LLM for conversation flow
+        llm=openai.LLM(
+            model="gpt-4o-mini",
+            temperature=0.2,  # More consistent, professional responses
+        ),
+        
+        # Professional TTS voice (like "Mark" in transcripts)
+        tts=elevenlabs.TTS(
+            voice_id="21m00Tcm4TlvDq8ikWAM",  # Professional male voice
+            voice_settings=elevenlabs.VoiceSettings(
+                stability=0.7,      # More stable for professional calls
+                similarity_boost=0.8,
+                style=0.1,          # Less dramatic, more professional
+                speed=0.95          # Slightly slower for clarity
+            ),
+            model="eleven_turbo_v2_5",  # Fastest model for low latency
+        ),
+        
+        # Enhanced turn detection for natural conversation flow
+        vad=silero.VAD.load(),
+        # FIXED: Use MultilingualModel instead of EOUModel
+        turn_detection=MultilingualModel(),  # Semantic end-of-utterance detection
+        
+        # Natural conversation timing (based on transcript analysis)
+        allow_interruptions=True,
+        min_interruption_duration=0.6,  # Allow natural interruptions
+        min_endpointing_delay=0.8,      # Natural pause handling
+        max_endpointing_delay=4.0,      # Allow time for people to think
+        
+        # FIXED: userdata goes in constructor, not start() method
+        userdata=userdata
+    )
+    
+    return session
+
 async def entrypoint(ctx: JobContext):
     """Multi-agent orchestrator entrypoint"""
     
@@ -486,16 +538,17 @@ async def entrypoint(ctx: JobContext):
     # Initialize knowledge base
     await qdrant_rag.initialize()
     
-    # Create enhanced session
-    session = await create_enhanced_session()
+    # Create call data and enhanced session
+    call_data = CallData()
+    session = await create_enhanced_session(call_data)
     
     # Start with dispatcher agent
     dispatcher = DispatcherAgent()
     
+    # FIXED: start() only takes agent and room parameters
     await session.start(
-        room=ctx.room,
         agent=dispatcher,
-        userdata=CallData()
+        room=ctx.room
     )
     
     # Professional greeting
