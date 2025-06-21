@@ -1,7 +1,7 @@
 # ultra_fast_qdrant_agent.py
 """
 Ultra-Fast LiveKit RAG Agent with Qdrant Integration
-FIXED: RAG timeout and context injection issues
+OPTIMIZED: Improved RAG timeout handling, caching, and search optimization
 """
 import asyncio
 import logging
@@ -38,12 +38,12 @@ logger = logging.getLogger(__name__)
 class UltraFastQdrantAgent(Agent):
     """
     Ultra-fast LiveKit agent with Qdrant RAG integration
-    FIXED: Proper timeout handling and context injection
+    OPTIMIZED: Better caching, timeout handling, and search performance
     """
     
     def __init__(self) -> None:
         super().__init__(
-            instructions="""You are a helpful AI voice assistant for phone calls. 
+            instructions=f"""You are a helpful AI voice assistant for phone calls. 
 
 CRITICAL INSTRUCTIONS:
 - Keep responses very short (under 30 words) for phone clarity
@@ -53,6 +53,11 @@ CRITICAL INSTRUCTIONS:
 - Always base your answers on the retrieved knowledge when available
 - If no relevant information is found, politely say you don't have that specific information
 
+PERFORMANCE OPTIMIZED:
+- Search timeout: {config.rag_timeout_ms}ms
+- Response length limit: {config.max_response_length} chars
+- Cache enabled for faster responses
+
 AVAILABLE TOOLS:
 - search_knowledge: Use for ALL information requests, questions, and details
 - transfer_to_human: ONLY use when explicitly requested transfer
@@ -60,10 +65,11 @@ AVAILABLE TOOLS:
 Always search for information first before giving generic responses."""
         )
         self.processing = False
+        self.search_cache = {}  # Agent-level cache for repeated questions
     
     async def on_user_turn_completed(self, turn_ctx: ChatContext, new_message: ChatMessage) -> None:
         """
-        FIXED: RAG injection with proper timeout handling
+        OPTIMIZED: RAG injection with improved caching and timeout handling
         """
         try:
             user_text = new_message.text_content
@@ -83,28 +89,50 @@ Always search for information first before giving generic responses."""
                     logger.info(f"🔄 Explicit transfer request detected: {user_text}")
                     return
                 
-                # FIXED: Use proper timeout that matches actual search performance
+                # Check agent-level cache first
+                cache_key = user_text.lower().strip()[:50]
+                if cache_key in self.search_cache:
+                    context = self.search_cache[cache_key]
+                    turn_ctx.add_message(
+                        role="system",
+                        content=f"[QdrantRAG]: {context}"
+                    )
+                    logger.info("⚡ Agent cache hit - context injected")
+                    return
+                
+                # OPTIMIZED: Use faster timeout that matches actual search performance
+                start_time = time.time()
                 results = await asyncio.wait_for(
-                    qdrant_rag.search(user_text, limit=3),
-                    timeout=config.rag_timeout_ms / 1000.0  # Convert to seconds
+                    qdrant_rag.search(user_text, limit=config.search_limit),
+                    timeout=config.rag_timeout_ms / 1000.0
                 )
                 
+                search_time = (time.time() - start_time) * 1000
+                
                 if results and len(results) > 0:
-                    # Use the best result with lowered threshold
+                    # Use the best result with optimized threshold
                     best_result = results[0]
                     if best_result["score"] >= config.similarity_threshold:
                         raw_content = best_result["text"]
                         context = self._clean_content_for_voice(raw_content)
+                        
+                        # Cache the result for future use
+                        self.search_cache[cache_key] = context
+                        if len(self.search_cache) > 50:  # Limit cache size
+                            # Remove oldest entry
+                            oldest_key = next(iter(self.search_cache))
+                            del self.search_cache[oldest_key]
+                        
                         turn_ctx.add_message(
                             role="system",
                             content=f"[QdrantRAG]: {context}"
                         )
-                        logger.info(f"⚡ RAG context injected (score: {best_result['score']:.3f})")
+                        logger.info(f"⚡ RAG context injected in {search_time:.1f}ms (score: {best_result['score']:.3f})")
                     else:
                         logger.info(f"⚠️ Low relevance score: {best_result['score']:.3f} < {config.similarity_threshold}")
                         
             except asyncio.TimeoutError:
-                logger.debug("⚡ RAG timeout - continuing without context")
+                logger.debug(f"⚡ RAG timeout after {config.rag_timeout_ms}ms - continuing without context")
             except Exception as e:
                 logger.error(f"❌ RAG error: {e}")
             finally:
@@ -115,7 +143,7 @@ Always search for information first before giving generic responses."""
             self.processing = False
     
     def _clean_content_for_voice(self, content: str) -> str:
-        """Clean content for voice response"""
+        """Clean content for voice response with length optimization"""
         try:
             # Remove common formatting characters
             content = content.replace("Q: ", "").replace("A: ", "")
@@ -133,24 +161,24 @@ Always search for information first before giving generic responses."""
                 else:
                     content = lines[0]
             
-            # Limit length for voice
-            if len(content) > 200:
+            # OPTIMIZED: Use config-based length limit for voice
+            if len(content) > config.max_response_length:
                 sentences = content.split('.')
                 if len(sentences) > 1:
                     content = sentences[0] + "."
                 else:
-                    content = content[:200] + "..."
+                    content = content[:config.max_response_length] + "..."
             
             return content
             
         except Exception:
-            return content[:150] if len(content) > 150 else content
+            return content[:config.max_response_length] if len(content) > config.max_response_length else content
 
     @function_tool()
     async def search_knowledge(self, query: str) -> str:
         """
         Search the knowledge base for information about any topic.
-        IMPROVED: Better handling of search results and scores
+        OPTIMIZED: Better caching, timeout handling, and result processing
         
         Use this for ALL information requests including:
         - Service information and pricing
@@ -161,12 +189,21 @@ Always search for information first before giving generic responses."""
         """
         try:
             logger.info(f"🔍 Searching knowledge base: {query}")
+            start_time = time.time()
             
-            # Search with proper timeout
+            # Check agent cache first
+            cache_key = query.lower().strip()[:50]
+            if cache_key in self.search_cache:
+                logger.info("⚡ Function cache hit")
+                return self.search_cache[cache_key]
+            
+            # Search with optimized timeout
             results = await asyncio.wait_for(
                 qdrant_rag.search(query, limit=config.search_limit),
                 timeout=config.rag_timeout_ms / 1000.0
             )
+            
+            search_time = (time.time() - start_time) * 1000
             
             if results and len(results) > 0:
                 # Find the best result with reasonable score
@@ -181,7 +218,7 @@ Always search for information first before giving generic responses."""
                 
                 content = self._clean_content_for_voice(best_result["text"])
                 
-                # If score is still low, try to combine multiple results
+                # OPTIMIZED: If score is still low, try to combine multiple results
                 if best_result["score"] < 0.4 and len(results) > 1:
                     logger.info("🔄 Low score, combining multiple results")
                     combined_content = []
@@ -191,16 +228,22 @@ Always search for information first before giving generic responses."""
                             combined_content.append(cleaned)
                     
                     if combined_content:
-                        content = " ".join(combined_content)[:200]  # Limit length
+                        content = " ".join(combined_content)[:config.max_response_length]
                 
-                logger.info(f"📊 Found result with score: {best_result['score']:.3f}")
+                # Cache the result
+                self.search_cache[cache_key] = content
+                if len(self.search_cache) > 50:
+                    oldest_key = next(iter(self.search_cache))
+                    del self.search_cache[oldest_key]
+                
+                logger.info(f"📊 Found result in {search_time:.1f}ms with score: {best_result['score']:.3f}")
                 return content
             else:
                 logger.warning("⚠️ No relevant information found in knowledge base")
                 return "I don't have specific information about that in my knowledge base. Would you like me to transfer you to someone who can help?"
             
         except asyncio.TimeoutError:
-            logger.error("❌ Knowledge search timeout")
+            logger.error(f"❌ Knowledge search timeout after {config.rag_timeout_ms}ms")
             return "I'm having trouble accessing the information right now. Let me try to help you directly or transfer you to someone who can assist."
         except Exception as e:
             logger.error(f"❌ Knowledge search error: {e}")
@@ -252,6 +295,23 @@ Always search for information first before giving generic responses."""
         except Exception as e:
             logger.error(f"❌ Transfer error: {e}")
             return "I'm having trouble with the transfer. Let me try to help you directly instead."
+
+    async def get_agent_stats(self) -> Dict[str, Any]:
+        """Get agent performance statistics"""
+        cache_stats = await qdrant_rag.get_cache_stats() if qdrant_rag.ready else {}
+        return {
+            "agent_cache_size": len(self.search_cache),
+            "agent_cache_max": 50,
+            "qdrant_ready": qdrant_rag.ready,
+            "qdrant_cache_stats": cache_stats,
+            "config": {
+                "rag_timeout_ms": config.rag_timeout_ms,
+                "search_limit": config.search_limit,
+                "similarity_threshold": config.similarity_threshold,
+                "max_response_length": config.max_response_length,
+                "embedding_cache_enabled": config.enable_embedding_cache
+            }
+        }
 
 async def create_ultra_fast_session() -> AgentSession:
     """Create ultra-fast optimized session with stable ElevenLabs TTS"""
@@ -314,21 +374,23 @@ async def create_ultra_fast_session() -> AgentSession:
 async def entrypoint(ctx: JobContext):
     """
     Ultra-fast entrypoint with Qdrant RAG and ElevenLabs TTS
-    FIXED: Better initialization and error handling
+    OPTIMIZED: Better initialization and performance monitoring
     """
-    logger.info("=== FIXED QDRANT RAG AGENT WITH ELEVENLABS STARTING ===")
+    logger.info("=== OPTIMIZED QDRANT RAG AGENT WITH ELEVENLABS STARTING ===")
     
     # Connect immediately
     await ctx.connect()
     logger.info("✅ Connected")
     
     # Initialize Qdrant RAG and session in parallel
+    init_start = time.time()
     init_tasks = [
         qdrant_rag.initialize(),
         create_ultra_fast_session()
     ]
     
     rag_success, session = await asyncio.gather(*init_tasks)
+    init_time = (time.time() - init_start) * 1000
     
     # Create agent
     agent = UltraFastQdrantAgent()
@@ -342,18 +404,36 @@ async def entrypoint(ctx: JobContext):
     )
     logger.info("✅ Initial greeting sent")
     
-    logger.info("⚡ FIXED QDRANT RAG AGENT READY!")
+    # Log performance statistics
+    if rag_success:
+        try:
+            stats = await agent.get_agent_stats()
+            logger.info("📊 PERFORMANCE STATS:")
+            logger.info(f"   Initialization time: {init_time:.1f}ms")
+            logger.info(f"   RAG timeout: {stats['config']['rag_timeout_ms']}ms")
+            logger.info(f"   Search limit: {stats['config']['search_limit']}")
+            logger.info(f"   Similarity threshold: {stats['config']['similarity_threshold']}")
+            logger.info(f"   Max response length: {stats['config']['max_response_length']}")
+            logger.info(f"   Embedding cache: {stats['config']['embedding_cache_enabled']}")
+            
+            # Cache stats
+            qdrant_cache = stats.get('qdrant_cache_stats', {})
+            logger.info(f"   Search cache: {qdrant_cache.get('search_cache_size', 0)}/{qdrant_cache.get('search_cache_max', 100)}")
+            logger.info(f"   Embedding cache: {qdrant_cache.get('embedding_cache_size', 0)}/{qdrant_cache.get('embedding_cache_max', 1000)}")
+            
+        except Exception as e:
+            logger.warning(f"Could not get stats: {e}")
+    
+    logger.info("⚡ OPTIMIZED QDRANT RAG AGENT READY!")
     logger.info(f"⚡ Qdrant RAG Status: {'✅ Active' if rag_success else '⚠️ Fallback'}")
     logger.info("🎙️ ElevenLabs TTS Status: ✅ Active")
-    
-    # Show current configuration
-    logger.info(f"📊 RAG Timeout: {config.rag_timeout_ms}ms")
-    logger.info(f"📊 Search Limit: {config.search_limit}")
-    logger.info(f"📊 Similarity Threshold: {config.similarity_threshold}")
+    logger.info(f"🚀 Performance Mode: Ultra-Fast ({config.rag_timeout_ms}ms timeout)")
 
 if __name__ == "__main__":
     try:
-        logger.info("⚡ Starting FIXED Qdrant RAG Agent with ElevenLabs")
+        logger.info("⚡ Starting OPTIMIZED Qdrant RAG Agent with ElevenLabs")
+        logger.info(f"🎯 Target Performance: <{config.rag_timeout_ms}ms search latency")
+        logger.info(f"🚀 Embedding Cache: {'Enabled' if config.enable_embedding_cache else 'Disabled'}")
         
         cli.run_app(WorkerOptions(
             entrypoint_fnc=entrypoint,

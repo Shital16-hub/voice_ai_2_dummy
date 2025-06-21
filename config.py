@@ -1,7 +1,7 @@
-# config.py - Updated for Local Qdrant Docker with Google STT
+# config.py - OPTIMIZED Configuration for LiveKit RAG Agent with Real-Time Performance
 """
-Optimized Configuration for LiveKit RAG Agent with Local Qdrant Docker and Google STT
-UPDATED: Added Google Cloud STT configuration
+Ultra-Optimized Configuration for LiveKit RAG Agent with Local Qdrant Docker and Google STT
+UPDATED: Optimized for real-time telephony performance with embedding caching
 """
 import os
 from pathlib import Path
@@ -29,7 +29,7 @@ class QdrantConfig(BaseSettings):
     elevenlabs_api_key: Optional[str] = Field(default=None, env="ELEVENLABS_API_KEY")
     eleven_api_key: Optional[str] = Field(default=None, env="ELEVEN_API_KEY")
     
-    # ✅ GOOGLE CLOUD STT SETTINGS (NEW)
+    # ✅ GOOGLE CLOUD STT SETTINGS
     google_credentials_file: Optional[str] = Field(
         default=None, 
         env="GOOGLE_APPLICATION_CREDENTIALS"
@@ -47,23 +47,19 @@ class QdrantConfig(BaseSettings):
     google_stt_model: str = Field(
         default="latest_long", 
         env="GOOGLE_STT_MODEL"
-    )  # Options: "chirp", "latest_long", "latest_short", "phone_call"
-    
+    )
     google_stt_language: str = Field(
         default="en-US", 
         env="GOOGLE_STT_LANGUAGE"
     )
-    
     google_stt_spoken_punctuation: bool = Field(
         default=False, 
         env="GOOGLE_STT_SPOKEN_PUNCTUATION"
     )
-    
     google_stt_interim_results: bool = Field(
         default=True, 
         env="GOOGLE_STT_INTERIM_RESULTS"
     )
-    
     google_stt_detect_language: bool = Field(
         default=False, 
         env="GOOGLE_STT_DETECT_LANGUAGE"
@@ -91,19 +87,32 @@ class QdrantConfig(BaseSettings):
     qdrant_timeout: int = Field(default=5, env="QDRANT_TIMEOUT")
     qdrant_grpc_port: int = Field(default=6334, env="QDRANT_GRPC_PORT")
     
-    # ✅ EMBEDDING SETTINGS
+    # 🚀 EMBEDDING OPTIMIZATION (Major Performance Gain)
     embedding_model: str = Field(default="text-embedding-3-small", env="EMBEDDING_MODEL")
-    embedding_dimensions: int = Field(default=1536, env="EMBEDDING_DIMENSIONS")
+    embedding_dimensions: int = Field(default=512, env="EMBEDDING_DIMENSIONS")  # REDUCED from 1536
     
-    # ✅ RAG SETTINGS (OPTIMIZED)
+    # 🚀 EMBEDDING PERFORMANCE SETTINGS
+    embedding_batch_size: int = Field(default=10, env="EMBEDDING_BATCH_SIZE")
+    enable_embedding_cache: bool = Field(default=True, env="ENABLE_EMBEDDING_CACHE")
+    embedding_cache_size: int = Field(default=1000, env="EMBEDDING_CACHE_SIZE")
+    
+    # ✅ RAG SETTINGS (OPTIMIZED FOR TELEPHONY)
     chunk_size: int = Field(default=300, env="CHUNK_SIZE")
     chunk_overlap: int = Field(default=50, env="CHUNK_OVERLAP")
     max_tokens: int = Field(default=50, env="MAX_TOKENS")
     
-    # ✅ PERFORMANCE SETTINGS (Optimized timing)
-    rag_timeout_ms: int = Field(default=1500, env="RAG_TIMEOUT_MS")
-    search_limit: int = Field(default=5, env="SEARCH_LIMIT")
-    similarity_threshold: float = Field(default=0.25, env="SIMILARITY_THRESHOLD")
+    # 🚀 AGGRESSIVE PERFORMANCE SETTINGS (Optimized timing)
+    rag_timeout_ms: int = Field(default=800, env="RAG_TIMEOUT_MS")  # REDUCED from 1500ms
+    search_limit: int = Field(default=2, env="SEARCH_LIMIT")  # REDUCED from 5
+    similarity_threshold: float = Field(default=0.3, env="SIMILARITY_THRESHOLD")  # INCREASED from 0.25
+    
+    # 🚀 QDRANT SEARCH OPTIMIZATION
+    qdrant_exact_search: bool = Field(default=False, env="QDRANT_EXACT_SEARCH")
+    qdrant_hnsw_ef: int = Field(default=64, env="QDRANT_HNSW_EF")  # REDUCED for speed
+    
+    # 🚀 TELEPHONY-SPECIFIC SETTINGS
+    max_response_length: int = Field(default=100, env="MAX_RESPONSE_LENGTH")  # Shorter responses
+    enable_response_streaming: bool = Field(default=True, env="ENABLE_RESPONSE_STREAMING")
     
     # ✅ LOCAL DOCKER OPTIMIZATION
     use_local_docker: bool = Field(default=True, env="USE_LOCAL_DOCKER")
@@ -187,9 +196,11 @@ def validate_config():
     print(f"📞 Transfer destination: {config.transfer_sip_address}")
     print(f"🔍 Qdrant URL: {config.qdrant_url}")
     print(f"🚀 Qdrant gRPC: {config.qdrant_prefer_grpc}")
-    print(f"⚡ RAG timeout: {config.rag_timeout_ms}ms")
-    print(f"🔍 Search limit: {config.search_limit}")
-    print(f"📊 Similarity threshold: {config.similarity_threshold}")
+    print(f"⚡ RAG timeout: {config.rag_timeout_ms}ms (OPTIMIZED)")
+    print(f"🔍 Search limit: {config.search_limit} (OPTIMIZED)")
+    print(f"📊 Similarity threshold: {config.similarity_threshold} (OPTIMIZED)")
+    print(f"🧠 Embedding dimensions: {config.embedding_dimensions} (OPTIMIZED)")
+    print(f"🚀 Embedding cache: {config.enable_embedding_cache}")
     print(f"🐳 Local Docker mode: {config.use_local_docker}")
     
     # Check Google STT configuration

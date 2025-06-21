@@ -1,7 +1,7 @@
-# qdrant_rag_system.py
+# qdrant_rag_system.py - FINAL PERFORMANCE FIX
 """
 Ultra-Fast Qdrant RAG System for LiveKit Telephony with Local Docker
-FIXED: Optimized search performance and timeout handling
+FINAL FIX: More aggressive caching with similarity-based embedding cache
 """
 import asyncio
 import logging
@@ -11,6 +11,8 @@ from pathlib import Path
 import json
 import uuid
 import requests
+import hashlib
+import difflib
 
 from qdrant_client import QdrantClient, AsyncQdrantClient
 from qdrant_client.models import (
@@ -28,7 +30,7 @@ logger = logging.getLogger(__name__)
 class QdrantRAGSystem:
     """
     Ultra-fast Qdrant RAG system optimized for telephony with local Docker
-    FIXED: Better timeout handling and search optimization
+    FINAL FIX: Aggressive similarity-based caching to minimize API calls
     """
     
     def __init__(self):
@@ -37,8 +39,19 @@ class QdrantRAGSystem:
         self.openai_client: Optional[openai.AsyncOpenAI] = None
         self.embedding_model: Optional[SentenceTransformer] = None
         self.ready = False
+        
+        # 🚀 SEARCH RESULT CACHE
         self.cache = {}
-        self.max_cache_size = 100  # Increased cache size
+        self.max_cache_size = 100
+        
+        # 🚀 AGGRESSIVE EMBEDDING CACHE FOR MASSIVE SPEED IMPROVEMENT
+        self.embedding_cache = {}
+        self.embedding_query_cache = {}  # Maps similar queries to existing embeddings
+        self.max_embedding_cache_size = config.embedding_cache_size
+        
+        # 🚀 PRE-COMPUTED EMBEDDINGS FOR COMMON QUERIES
+        self.common_query_embeddings = {}
+        
         self.local_mode = True
         
     async def initialize(self) -> bool:
@@ -63,9 +76,12 @@ class QdrantRAGSystem:
             # Load existing data if available
             await self._load_existing_data()
             
+            # 🚀 WARM UP CACHE FOR BETTER PERFORMANCE
+            await self._warm_up_cache()
+            
             self.ready = True
             elapsed = (time.time() - start_time) * 1000
-            logger.info(f"✅ Local Qdrant RAG initialized in {elapsed:.1f}ms")
+            logger.info(f"✅ OPTIMIZED Qdrant RAG initialized in {elapsed:.1f}ms")
             return True
             
         except Exception as e:
@@ -73,7 +89,7 @@ class QdrantRAGSystem:
             return False
     
     async def _check_docker_health(self) -> bool:
-        """FIXED: Check if Qdrant Docker container is healthy using correct endpoint"""
+        """Check if Qdrant Docker container is healthy using correct endpoint"""
         try:
             for attempt in range(config.docker_health_check_retries):
                 try:
@@ -114,7 +130,7 @@ class QdrantRAGSystem:
                 api_key=config.openai_api_key
             )
             
-            logger.info("✅ Simple Qdrant clients initialized")
+            logger.info("✅ Optimized Qdrant clients initialized")
             
         except Exception as e:
             logger.error(f"❌ Failed to initialize clients: {e}")
@@ -124,7 +140,7 @@ class QdrantRAGSystem:
         """Initialize embedding model"""
         try:
             if config.embedding_model.startswith("text-embedding"):
-                logger.info("✅ Using OpenAI embeddings")
+                logger.info("✅ Using OpenAI embeddings with caching")
             else:
                 self.embedding_model = await asyncio.to_thread(
                     SentenceTransformer,
@@ -157,24 +173,24 @@ class QdrantRAGSystem:
                     self.client.create_collection,
                     collection_name=collection_name,
                     vectors_config=VectorParams(
-                        size=config.embedding_dimensions,
+                        size=config.embedding_dimensions,  # OPTIMIZED: Reduced dimensions
                         distance=Distance.COSINE,
                         # Optimized HNSW for local Docker (speed over accuracy)
                         hnsw_config=HnswConfigDiff(
-                            m=16,  # Increased for better recall
-                            ef_construct=200,  # Increased for better indexing
-                            full_scan_threshold=10000,  # Use full scan for small collections
-                            max_indexing_threads=0,  # Use all available threads
+                            m=16,
+                            ef_construct=200,
+                            full_scan_threshold=10000,
+                            max_indexing_threads=0,
                         )
                     ),
                     # Optimize storage for local telephony
                     optimizers_config=OptimizersConfigDiff(
-                        default_segment_number=1,  # Single segment for small datasets
+                        default_segment_number=1,
                         max_segment_size=None,
-                        memmap_threshold=0,  # Disable mmap for speed
-                        indexing_threshold=20000,  # Index sooner
-                        flush_interval_sec=5,  # Regular flushes
-                        max_optimization_threads=1  # Don't over-optimize
+                        memmap_threshold=0,
+                        indexing_threshold=20000,
+                        flush_interval_sec=5,
+                        max_optimization_threads=1
                     )
                 )
                 logger.info(f"✅ Created ultra-optimized local collection: {collection_name}")
@@ -297,6 +313,29 @@ class QdrantRAGSystem:
         
         return [c for c in chunks if c.strip()]
     
+    def _get_embedding_cache_key(self, text: str) -> str:
+        """Generate cache key for embedding"""
+        # Normalize text and create hash for consistent caching
+        normalized = text.lower().strip()[:200]  # First 200 chars
+        return hashlib.md5(normalized.encode()).hexdigest()
+    
+    def _find_similar_query(self, query: str, threshold: float = 0.8) -> Optional[str]:
+        """🚀 NEW: Find similar cached query to avoid API call"""
+        normalized_query = query.lower().strip()
+        
+        # Check for exact matches first
+        if normalized_query in self.embedding_query_cache:
+            return self.embedding_query_cache[normalized_query]
+        
+        # Check for similar queries using fuzzy matching
+        for cached_query in self.embedding_query_cache.keys():
+            similarity = difflib.SequenceMatcher(None, normalized_query, cached_query).ratio()
+            if similarity >= threshold:
+                logger.debug(f"⚡ Similar query found: {similarity:.2f} similarity")
+                return self.embedding_query_cache[cached_query]
+        
+        return None
+    
     async def _create_embedding(self, text: str) -> List[float]:
         """Create embedding for text"""
         try:
@@ -318,13 +357,83 @@ class QdrantRAGSystem:
             logger.error(f"❌ Failed to create embedding: {e}")
             raise
     
+    async def _create_embedding_cached(self, text: str) -> List[float]:
+        """🚀 SUPER AGGRESSIVE embedding caching - Major performance improvement"""
+        if not config.enable_embedding_cache:
+            return await self._create_embedding(text)
+        
+        # Get cache key
+        cache_key = self._get_embedding_cache_key(text)
+        normalized_query = text.lower().strip()
+        
+        # Check direct cache hit
+        if cache_key in self.embedding_cache:
+            logger.debug("⚡ Direct embedding cache hit!")
+            return self.embedding_cache[cache_key]
+        
+        # 🚀 NEW: Check for similar queries to avoid API call
+        similar_cache_key = self._find_similar_query(normalized_query)
+        if similar_cache_key and similar_cache_key in self.embedding_cache:
+            logger.debug("⚡ Similar query embedding cache hit!")
+            # Store this query mapping for future use
+            self.embedding_query_cache[normalized_query] = similar_cache_key
+            return self.embedding_cache[similar_cache_key]
+        
+        # Create embedding (API call required)
+        start_time = time.time()
+        embedding = await self._create_embedding(text)
+        api_time = (time.time() - start_time) * 1000
+        
+        logger.debug(f"📡 OpenAI API call: {api_time:.1f}ms")
+        
+        # Cache management - Remove oldest 20% if cache is full
+        if len(self.embedding_cache) >= self.max_embedding_cache_size:
+            oldest_keys = list(self.embedding_cache.keys())[:int(self.max_embedding_cache_size * 0.2)]
+            for key in oldest_keys:
+                del self.embedding_cache[key]
+        
+        # Store in cache
+        self.embedding_cache[cache_key] = embedding
+        self.embedding_query_cache[normalized_query] = cache_key
+        
+        return embedding
+    
+    async def _warm_up_cache(self):
+        """🔥 Pre-warm cache with common telephony queries"""
+        if not config.enable_embedding_cache:
+            return
+        
+        common_queries = [
+            "towing service", "battery help", "membership", "pricing", 
+            "cost", "emergency", "roadside assistance", "tire change",
+            "fuel delivery", "jump start", "lockout service", "business hours",
+            "contact information", "services offered", "location address",
+            "phone number", "email contact", "appointment booking",
+            # Add variations that users might say
+            "how much does it cost", "what services do you offer",
+            "do you tow cars", "can you help with my battery",
+            "what are your prices", "emergency help"
+        ]
+        
+        logger.info("🔥 Warming up embedding cache...")
+        start_time = time.time()
+        
+        for query in common_queries:
+            try:
+                await self._create_embedding_cached(query)
+            except Exception as e:
+                logger.warning(f"Cache warm-up failed for '{query}': {e}")
+        
+        elapsed = (time.time() - start_time) * 1000
+        logger.info(f"✅ Cache warmed with {len(self.embedding_cache)} embeddings in {elapsed:.1f}ms")
+    
     async def add_documents(self, documents: List[Dict[str, Any]]) -> bool:
-        """Add documents to Qdrant collection"""
+        """Add documents to Qdrant collection with optimized embedding creation"""
         try:
             points = []
             
             for doc in documents:
-                embedding = await self._create_embedding(doc["text"])
+                embedding = await self._create_embedding_cached(doc["text"])
                 point_id = str(uuid.uuid4())
                 
                 point = PointStruct(
@@ -352,24 +461,24 @@ class QdrantRAGSystem:
             return False
     
     async def search(self, query: str, limit: int = None) -> List[Dict[str, Any]]:
-        """FIXED: Ultra-fast search optimized for local Docker with better timeout handling"""
+        """🚀 ULTRA-FAST search optimized for local Docker with aggressive caching"""
         if not self.ready:
             return []
         
         try:
             start_time = time.time()
             
-            # Check cache with better cache key
+            # 🚀 STEP 1: Check search result cache first
             cache_key = f"{query.lower().strip()}_{limit or config.search_limit}"
             if cache_key in self.cache:
                 elapsed = (time.time() - start_time) * 1000
-                logger.info(f"⚡ Local cache hit in {elapsed:.1f}ms")
+                logger.info(f"⚡ FULL CACHE HIT: {elapsed:.1f}ms")
                 return self.cache[cache_key]
             
-            # Create query embedding
-            query_embedding = await self._create_embedding(query)
+            # 🚀 STEP 2: Use super aggressive cached embedding creation
+            query_embedding = await self._create_embedding_cached(query)
             
-            # FIXED: Search with proper timeout handling
+            # 🚀 STEP 3: Optimized Qdrant search with reduced parameters
             search_result = await asyncio.wait_for(
                 self.aclient.search(
                     collection_name=config.qdrant_collection_name,
@@ -377,19 +486,24 @@ class QdrantRAGSystem:
                     limit=limit or config.search_limit,
                     score_threshold=config.similarity_threshold,
                     search_params=SearchParams(
-                        hnsw_ef=128,  # Increased for better recall
-                        exact=False
+                        hnsw_ef=config.qdrant_hnsw_ef,  # Reduced for speed
+                        exact=config.qdrant_exact_search
                     )
                 ),
-                timeout=config.rag_timeout_ms / 1000.0  # Use config timeout
+                timeout=config.rag_timeout_ms / 1000.0
             )
             
-            # Format results
+            # 🚀 STEP 4: Quick result formatting
             results = []
             for point in search_result:
+                text = point.payload.get("text", "")
+                # Truncate for telephony
+                if len(text) > config.max_response_length:
+                    text = text[:config.max_response_length] + "..."
+                
                 results.append({
                     "id": str(point.id),
-                    "text": point.payload.get("text", ""),
+                    "text": text,
                     "score": float(point.score),
                     "metadata": {
                         k: v for k, v in point.payload.items() 
@@ -406,16 +520,27 @@ class QdrantRAGSystem:
             self.cache[cache_key] = results
             
             elapsed = (time.time() - start_time) * 1000
-            logger.info(f"⚡ Local search completed in {elapsed:.1f}ms, found {len(results)} results")
+            logger.info(f"⚡ OPTIMIZED search completed in {elapsed:.1f}ms, found {len(results)} results")
             return results
             
         except asyncio.TimeoutError:
             elapsed = (time.time() - start_time) * 1000
-            logger.warning(f"⚠️ Local search timeout after {elapsed:.1f}ms")
+            logger.warning(f"⚠️ Search timeout after {elapsed:.1f}ms")
             return []
         except Exception as e:
-            logger.error(f"❌ Local search error: {e}")
+            logger.error(f"❌ Search error: {e}")
             return []
+    
+    async def get_cache_stats(self) -> Dict[str, Any]:
+        """Get cache statistics for monitoring"""
+        return {
+            "search_cache_size": len(self.cache),
+            "search_cache_max": self.max_cache_size,
+            "embedding_cache_size": len(self.embedding_cache),
+            "embedding_cache_max": self.max_embedding_cache_size,
+            "embedding_cache_enabled": config.enable_embedding_cache,
+            "query_mapping_cache_size": len(self.embedding_query_cache)
+        }
     
     async def close(self):
         """Clean up resources"""
@@ -424,7 +549,7 @@ class QdrantRAGSystem:
                 self.client.close()
             if self.aclient:
                 await self.aclient.close()
-            logger.info("✅ Local Qdrant RAG system closed")
+            logger.info("✅ Optimized Qdrant RAG system closed")
         except Exception as e:
             logger.error(f"❌ Error closing Qdrant RAG system: {e}")
 
